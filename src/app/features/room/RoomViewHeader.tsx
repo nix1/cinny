@@ -34,6 +34,8 @@ import { StateEvent } from '../../../types/matrix/room';
 import { useMatrixClient } from '../../hooks/useMatrixClient';
 import { useIsDirectRoom, useRoom } from '../../hooks/useRoom';
 import { useSetting } from '../../state/hooks/settings';
+import { useAtom } from 'jotai';
+import { threadsPanelAtom } from '../../state/room/threadSelection';
 import { settingsAtom } from '../../state/settings';
 import { useSpaceOptionally } from '../../hooks/useSpace';
 import { getHomeSearchPath, getSpaceSearchPath, withSearchParam } from '../../pages/pathUtils';
@@ -416,6 +418,7 @@ export function RoomViewHeader({ callView }: { callView?: boolean }) {
     : undefined;
 
   const [peopleDrawer, setPeopleDrawer] = useSetting(settingsAtom, 'isPeopleDrawer');
+  const [threadsDrawer, setThreadsDrawer] = useAtom(threadsPanelAtom);
 
   const handleSearchClick = () => {
     const searchParams: _SearchPathSearchParams = {
@@ -443,6 +446,11 @@ export function RoomViewHeader({ callView }: { callView?: boolean }) {
       return;
     }
     setPeopleDrawer(!peopleDrawer);
+    setThreadsDrawer(false);
+  };
+
+  const handleThreadsToggle = () => {
+    setThreadsDrawer(!threadsDrawer);
   };
 
   return (
@@ -597,6 +605,24 @@ export function RoomViewHeader({ callView }: { callView?: boolean }) {
           {!room.isCallRoom() && livekitSupported && rtcSupported && hasCallPermission && (
             <CallButton />
           )}
+          {screenSize === ScreenSize.Desktop && (
+            <TooltipProvider
+              position="Bottom"
+              offset={4}
+              tooltip={
+                <Tooltip>
+                  <Text>{threadsDrawer ? 'Hide Threads' : 'Show Threads'}</Text>
+                </Tooltip>
+              }
+            >
+              {(triggerRef) => (
+                <IconButton fill="None" ref={triggerRef} onClick={handleThreadsToggle}>
+                  <Icon size="400" src={Icons.Thread} />
+                </IconButton>
+              )}
+            </TooltipProvider>
+          )}
+
           {screenSize === ScreenSize.Desktop && (
             <TooltipProvider
               position="Bottom"
