@@ -33,7 +33,7 @@ export function Room() {
   const callEmbed = useCallEmbed();
 
   const [isDrawer] = useSetting(settingsAtom, 'isPeopleDrawer');
-  const [threadsPanel] = useAtom(threadsPanelAtom);
+  const [threadsPanel, setThreadsPanel] = useAtom(threadsPanelAtom);
   const [threadSupport] = useSetting(settingsAtom, 'threadSupport');
   const threadsDrawer = threadsPanel && threadSupport;
   const [hideActivity] = useSetting(settingsAtom, 'hideActivity');
@@ -49,8 +49,12 @@ export function Room() {
         if (isKeyHotkey('escape', evt)) {
           markAsRead(mx, room.roomId, hideActivity, true);
         }
+        if (threadSupport && isKeyHotkey('mod+shift+t', evt)) {
+          evt.preventDefault();
+          setThreadsPanel((open) => !open);
+        }
       },
-      [mx, room.roomId, hideActivity]
+      [mx, room.roomId, hideActivity, threadSupport, setThreadsPanel]
     )
   );
 

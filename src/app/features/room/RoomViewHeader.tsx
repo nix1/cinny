@@ -36,6 +36,8 @@ import { useMatrixClient } from '../../hooks/useMatrixClient';
 import { useIsDirectRoom, useRoom } from '../../hooks/useRoom';
 import { useSetting } from '../../state/hooks/settings';
 import { threadsPanelAtom } from '../../state/room/threadSelection';
+import { KeySymbol } from '../../utils/key-symbol';
+import { isMacOS } from '../../utils/user-agent';
 import { settingsAtom } from '../../state/settings';
 import { useSpaceOptionally } from '../../hooks/useSpace';
 import { getHomeSearchPath, getSpaceSearchPath, withSearchParam } from '../../pages/pathUtils';
@@ -612,7 +614,10 @@ export function RoomViewHeader({ callView }: { callView?: boolean }) {
               offset={4}
               tooltip={
                 <Tooltip>
-                  <Text>{threadsDrawer ? 'Hide Threads' : 'Show Threads'}</Text>
+                  <Text>
+                    {threadsDrawer ? 'Hide Threads' : 'Show Threads'} (
+                    {isMacOS() ? KeySymbol.Command : 'Ctrl'} + Shift + T)
+                  </Text>
                 </Tooltip>
               }
             >
