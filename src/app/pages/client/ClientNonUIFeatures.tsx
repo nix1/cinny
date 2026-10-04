@@ -1,7 +1,9 @@
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RoomEvent, RoomEventHandlerMap } from 'matrix-js-sdk';
+import { selectedThreadAtom, threadsPanelAtom } from '../../state/room/threadSelection';
+import { useRoomNavigate } from '../../hooks/useRoomNavigate';
 import { roomToUnreadAtom, unreadEqual, unreadInfoToUnread } from '../../state/room/roomToUnread';
 import LogoSVG from '../../../../public/res/svg/cinny.svg';
 import LogoUnreadSVG from '../../../../public/res/svg/cinny-unread.svg';
@@ -140,18 +142,24 @@ function MessageNotifications() {
   const navigate = useNavigate();
   const notificationSelected = useInboxNotificationsSelected();
   const selectedRoomId = useSelectedRoom();
+  const { navigateRoom } = useRoomNavigate();
+  const setSelectedThread = useSetAtom(selectedThreadAtom);
+  const setThreadsPanel = useSetAtom(threadsPanelAtom);
 
   const notify = useCallback(
     ({
       roomName,
       roomAvatar,
       username,
+      roomId,
+      threadRootId,
     }: {
       roomName: string;
       roomAvatar?: string;
       username: string;
       roomId: string;
       eventId: string;
+      threadRootId?: string;
     }) => {
       const noti = new window.Notification(roomName, {
         icon: roomAvatar,
@@ -161,7 +169,15 @@ function MessageNotifications() {
       });
 
       noti.onclick = () => {
-        if (!window.closed) navigate(getInboxNotificationsPath());
+        if (!window.closed) {
+          if (threadRootId) {
+            setSelectedThread({ roomId, threadId: threadRootId });
+            setThreadsPanel(true);
+            navigateRoom(roomId);
+          } else {
+            navigate(getInboxNotificationsPath());
+          }
+        }
         noti.close();
         notifRef.current = undefined;
       };
@@ -169,7 +185,7 @@ function MessageNotifications() {
       notifRef.current?.close();
       notifRef.current = noti;
     },
-    [navigate]
+    [navigate, navigateRoom, setSelectedThread, setThreadsPanel]
   );
 
   const playSound = useCallback(() => {
@@ -223,6 +239,7 @@ function MessageNotifications() {
           username: getMemberDisplayName(room, sender) ?? getMxIdLocalPart(sender) ?? sender,
           roomId: room.roomId,
           eventId,
+          threadRootId: mEvent.threadRootId,
         });
       }
 

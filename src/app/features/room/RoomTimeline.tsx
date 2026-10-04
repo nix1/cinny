@@ -84,7 +84,7 @@ import {
   isMembershipChanged,
   reactionOrEditEvent,
 } from '../../utils/room';
-import { useSetting, useSetSetting } from '../../state/hooks/settings';
+import { useSetting } from '../../state/hooks/settings';
 import { MessageLayout, settingsAtom } from '../../state/settings';
 import { selectedThreadAtom, threadsPanelAtom } from '../../state/room/threadSelection';
 import { useMatrixEventRenderer } from '../../hooks/useMatrixEventRenderer';
