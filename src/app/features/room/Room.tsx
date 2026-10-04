@@ -45,7 +45,7 @@ export function Room() {
     useCallback(
       (evt) => {
         if (isKeyHotkey('escape', evt)) {
-          markAsRead(mx, room.roomId, hideActivity);
+          markAsRead(mx, room.roomId, hideActivity, true);
         }
       },
       [mx, room.roomId, hideActivity]

@@ -43,7 +43,7 @@ import { stopPropagation } from '../../utils/keyboard';
 
 import * as css from './ThreadsDrawer.css';
 import { useMatrixClient } from '../../hooks/useMatrixClient';
-import { useSetting, useSetSetting } from '../../state/hooks/settings';
+import { useSetting } from '../../state/hooks/settings';
 import { settingsAtom, MessageLayout } from '../../state/settings';
 import { selectedThreadAtom, threadsPanelAtom } from '../../state/room/threadSelection';
 import {
