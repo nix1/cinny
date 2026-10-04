@@ -22,6 +22,7 @@ import { MessageSearchParams, useMessageSearch } from './useMessageSearch';
 import { SearchResultGroup } from './SearchResultGroup';
 import { SearchInput } from './SearchInput';
 import { SearchFilters } from './SearchFilters';
+import { useSearchIndexStatus } from '../../plugins/search-index';
 import { VirtualTile } from '../../components/virtualizer';
 
 const useSearchPathSearchParams = (searchParams: URLSearchParams): _SearchPathSearchParams =>
@@ -95,6 +96,7 @@ export function MessageSearch({
   }, [searchPathSearchParams, searchParamRooms, searchParamsSenders, rooms, senders]);
 
   const searchMessages = useMessageSearch(msgSearchParams);
+  const indexStatus = useSearchIndexStatus();
 
   const { status, data, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     enabled: !!msgSearchParams.term,
@@ -222,6 +224,13 @@ export function MessageSearch({
           order={msgSearchParams.order}
           onOrderChange={handleOrderChange}
         />
+        {indexStatus && (
+          <Text size="T200" priority="300">
+            {indexStatus.running
+              ? `Indexing history for local search: ${indexStatus.roomsDone}/${indexStatus.roomsTotal} rooms, ${indexStatus.messages} messages. Older messages may be missing until it finishes.`
+              : `Local search index: ${indexStatus.messages} messages, including encrypted rooms.`}
+          </Text>
+        )}
       </Box>
 
       {!msgSearchParams.term && status === 'pending' && (

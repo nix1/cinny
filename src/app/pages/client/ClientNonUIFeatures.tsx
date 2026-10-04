@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { RoomEvent, RoomEventHandlerMap } from 'matrix-js-sdk';
 import { selectedThreadAtom, threadsPanelAtom } from '../../state/room/threadSelection';
 import { useRoomNavigate } from '../../hooks/useRoomNavigate';
+import { startSearchIndexer, stopSearchIndexer } from '../../plugins/search-index';
 import { roomToUnreadAtom, unreadEqual, unreadInfoToUnread } from '../../state/room/roomToUnread';
 import LogoSVG from '../../../../public/res/svg/cinny.svg';
 import LogoUnreadSVG from '../../../../public/res/svg/cinny-unread.svg';
@@ -74,6 +75,20 @@ function FaviconUpdater() {
       setFavicon(LogoSVG);
     }
   }, [roomToUnread]);
+
+  return null;
+}
+
+function SearchIndexFeature() {
+  const mx = useMatrixClient();
+
+  useEffect(() => {
+    startSearchIndexer(mx).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to start the local search index', err);
+    });
+    return () => stopSearchIndexer();
+  }, [mx]);
 
   return null;
 }
@@ -282,6 +297,7 @@ export function ClientNonUIFeatures({ children }: ClientNonUIFeaturesProps) {
       <FaviconUpdater />
       <InviteNotifications />
       <MessageNotifications />
+      <SearchIndexFeature />
       {children}
     </>
   );

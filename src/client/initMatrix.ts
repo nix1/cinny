@@ -4,6 +4,7 @@ import { cryptoCallbacks } from './secretStorageKeys';
 import { clearNavToActivePathStore } from '../app/state/navToActivePath';
 import { pushSessionToSW } from '../sw-session';
 import { getSettings } from '../app/state/settings';
+import { deleteSearchIndex } from '../app/plugins/search-index';
 
 type Session = {
   baseUrl: string;
@@ -73,6 +74,7 @@ export const logoutClient = async (mx: MatrixClient) => {
   } catch {
     // ignore if failed to logout
   }
+  await deleteSearchIndex(mx.getSafeUserId());
   await mx.clearStores();
   window.localStorage.clear();
   window.location.reload();
