@@ -3,6 +3,7 @@ import { createClient, MatrixClient, IndexedDBStore, IndexedDBCryptoStore } from
 import { cryptoCallbacks } from './secretStorageKeys';
 import { clearNavToActivePathStore } from '../app/state/navToActivePath';
 import { pushSessionToSW } from '../sw-session';
+import { getSettings } from '../app/state/settings';
 
 type Session = {
   baseUrl: string;
@@ -40,18 +41,28 @@ export const initClient = async (session: Session): Promise<MatrixClient> => {
   return mx;
 };
 
-export const startClient = async (mx: MatrixClient) => {
-  await mx.startClient({
-    lazyLoadMembers: true,
-    threadSupport: true,
-  });
-};
-
 export const clearCacheAndReload = async (mx: MatrixClient) => {
   mx.stopClient();
   clearNavToActivePathStore(mx.getSafeUserId());
   await mx.store.deleteAllData();
   window.location.reload();
+};
+
+export const startClient = async (mx: MatrixClient) => {
+  const { threadSupport } = getSettings();
+
+  // Sync data cached with a different thread mode has events in the wrong
+  // timelines, so it has to be dropped once when the mode changes.
+  const storedOpts = await mx.store.getClientOptions();
+  if (storedOpts && !!storedOpts.threadSupport !== threadSupport) {
+    await clearCacheAndReload(mx);
+    return;
+  }
+
+  await mx.startClient({
+    lazyLoadMembers: true,
+    threadSupport,
+  });
 };
 
 export const logoutClient = async (mx: MatrixClient) => {

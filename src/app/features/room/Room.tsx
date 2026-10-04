@@ -33,7 +33,9 @@ export function Room() {
   const callEmbed = useCallEmbed();
 
   const [isDrawer] = useSetting(settingsAtom, 'isPeopleDrawer');
-  const [threadsDrawer] = useAtom(threadsPanelAtom);
+  const [threadsPanel] = useAtom(threadsPanelAtom);
+  const [threadSupport] = useSetting(settingsAtom, 'threadSupport');
+  const threadsDrawer = threadsPanel && threadSupport;
   const [hideActivity] = useSetting(settingsAtom, 'hideActivity');
   const screenSize = useScreenSizeContext();
   const powerLevels = usePowerLevels(room);

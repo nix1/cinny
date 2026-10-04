@@ -82,7 +82,11 @@ export function ThreadSummary({ room, thread, onOpen }: ThreadSummaryProps) {
       onClick={handleClick}
       aria-label={hasUnread ? 'Open thread with unread replies' : 'Open thread'}
     >
-      <Icon size="100" src={hasUnread ? Icons.ThreadUnread : Icons.Thread} style={{ flexShrink: 0 }} />
+      <Icon
+        size="100"
+        src={hasUnread ? Icons.ThreadUnread : Icons.Thread}
+        style={{ flexShrink: 0 }}
+      />
       <Text size="T200" priority="300" truncate style={{ flexGrow: 1 }} align="Left">
         {preview
           ? `${replyCount} reply${replyCount === 1 ? '' : 's'} · ${preview}`

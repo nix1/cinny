@@ -1,11 +1,4 @@
-import React, {
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
   Avatar,
@@ -179,12 +172,7 @@ function ThreadList({
               </Text>
             )}
             {threads.map((thread) => (
-              <ThreadListItem
-                key={thread.id}
-                room={room}
-                thread={thread}
-                onSelect={onSelect}
-              />
+              <ThreadListItem key={thread.id} room={room} thread={thread} onSelect={onSelect} />
             ))}
           </Box>
         </Scroll>
@@ -426,9 +414,12 @@ function ThreadMessages({
         const senderId = mEvent.getSender() ?? '';
         const senderDisplayName = getSenderName(room, senderId);
         const eventId = mEvent.getId();
-        const editedEvent = eventId ? getEditedEvent(eventId, mEvent, thread.timelineSet) : undefined;
+        const editedEvent = eventId
+          ? getEditedEvent(eventId, mEvent, thread.timelineSet)
+          : undefined;
         const getContent = (() =>
-          editedEvent?.getContent()['m.new_content'] ?? mEvent.getContent()) as unknown as GetContentCallback;
+          editedEvent?.getContent()['m.new_content'] ??
+          mEvent.getContent()) as unknown as GetContentCallback;
         const eventType = mEvent.getType();
         const reactionRelations = eventId
           ? getEventReactions(thread.timelineSet, eventId)
@@ -738,7 +729,13 @@ function ThreadDetail({
         </TooltipProvider>
       </Header>
       <Box className={css.ThreadDrawerContentBase} grow="Yes">
-        <Scroll ref={scrollRef} variant="Background" size="300" visibility="Always" hideTrack={false}>
+        <Scroll
+          ref={scrollRef}
+          variant="Background"
+          size="300"
+          visibility="Always"
+          hideTrack={false}
+        >
           <Box className={css.ThreadDrawerContent} direction="Column" gap="100">
             <ThreadMessages room={room} thread={thread} onEventsCount={handleEventsCount} />
           </Box>

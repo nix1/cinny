@@ -419,6 +419,7 @@ export function RoomViewHeader({ callView }: { callView?: boolean }) {
 
   const [peopleDrawer, setPeopleDrawer] = useSetting(settingsAtom, 'isPeopleDrawer');
   const [threadsDrawer, setThreadsDrawer] = useAtom(threadsPanelAtom);
+  const [threadSupport] = useSetting(settingsAtom, 'threadSupport');
 
   const handleSearchClick = () => {
     const searchParams: _SearchPathSearchParams = {
@@ -605,7 +606,7 @@ export function RoomViewHeader({ callView }: { callView?: boolean }) {
           {!room.isCallRoom() && livekitSupported && rtcSupported && hasCallPermission && (
             <CallButton />
           )}
-          {screenSize === ScreenSize.Desktop && (
+          {screenSize === ScreenSize.Desktop && threadSupport && (
             <TooltipProvider
               position="Bottom"
               offset={4}

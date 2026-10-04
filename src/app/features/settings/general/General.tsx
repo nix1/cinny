@@ -711,6 +711,12 @@ function Editor() {
   const [enterForNewline, setEnterForNewline] = useSetting(settingsAtom, 'enterForNewline');
   const [isMarkdown, setIsMarkdown] = useSetting(settingsAtom, 'isMarkdown');
   const [hideActivity, setHideActivity] = useSetting(settingsAtom, 'hideActivity');
+  const [threadSupport, setThreadSupport] = useSetting(settingsAtom, 'threadSupport');
+
+  const handleThreadSupport = (enabled: boolean) => {
+    setThreadSupport(enabled);
+    window.location.reload();
+  };
 
   return (
     <Box direction="Column" gap="100">
@@ -735,6 +741,13 @@ function Editor() {
           title="Hide Typing & Read Receipts"
           description="Turn off both typing status and read receipts to keep your activity private."
           after={<Switch variant="Primary" value={hideActivity} onChange={setHideActivity} />}
+        />
+      </SequenceCard>
+      <SequenceCard className={SequenceCardStyle} variant="SurfaceVariant" direction="Column">
+        <SettingTile
+          title="Threads"
+          description="Show thread replies in a side panel instead of the main timeline. Changing this reloads the app and clears the local cache, which can slow down startup."
+          after={<Switch variant="Primary" value={threadSupport} onChange={handleThreadSupport} />}
         />
       </SequenceCard>
     </Box>

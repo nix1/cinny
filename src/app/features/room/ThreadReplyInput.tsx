@@ -1,10 +1,4 @@
-import React, {
-  KeyboardEventHandler,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { KeyboardEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Icon, IconButton, Icons, Line, PopOut, config } from 'folds';
 import { isKeyHotkey } from 'is-hotkey';
 import {
@@ -169,11 +163,7 @@ function ThreadReplyInput({ room, thread }: { room: Room; thread: Thread }) {
       }
       const prevWordRange = getPrevWordRange(editor);
       const query = prevWordRange
-        ? getAutocompleteQuery<AutocompletePrefix>(
-            editor,
-            prevWordRange,
-            AUTOCOMPLETE_PREFIXES
-          )
+        ? getAutocompleteQuery<AutocompletePrefix>(editor, prevWordRange, AUTOCOMPLETE_PREFIXES)
         : undefined;
       setAutocompleteQuery(query);
     },
@@ -301,10 +291,7 @@ function ThreadReplyInput({ room, thread }: { room: Room; thread: Thread }) {
                       size="300"
                       radii="300"
                     >
-                      <Icon
-                        src={Icons.Sticker}
-                        filled={emojiBoardTab === EmojiBoardTab.Sticker}
-                      />
+                      <Icon src={Icons.Sticker} filled={emojiBoardTab === EmojiBoardTab.Sticker} />
                     </IconButton>
                   )}
                   <IconButton
