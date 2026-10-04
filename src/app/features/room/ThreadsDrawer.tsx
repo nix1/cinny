@@ -53,8 +53,14 @@ import {
   makeMentionCustomProps,
   renderMatrixMention,
 } from '../../plugins/react-custom-html-parser';
-import { getMemberDisplayName, getEditedEvent } from '../../utils/room';
-import { getMxIdLocalPart } from '../../utils/matrix';
+import {
+  getMemberDisplayName,
+  getEditedEvent,
+  getEventReactions,
+  getReactionContent,
+} from '../../utils/room';
+import { useRoomPermissions } from '../../hooks/useRoomPermissions';
+import { eventWithShortcode, factoryEventSentBy, getMxIdLocalPart } from '../../utils/matrix';
 import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
 import { useMentionClickHandler } from '../../hooks/useMentionClickHandler';
 import { useSpoilerClickHandler } from '../../hooks/useSpoilerClickHandler';
@@ -66,7 +72,7 @@ import { usePowerLevelTags } from '../../hooks/usePowerLevelTags';
 import { usePowerLevelsContext } from '../../hooks/usePowerLevels';
 import { useTheme } from '../../hooks/useTheme';
 import { RenderMessageContent } from '../../components/RenderMessageContent';
-import { Message, EncryptedContent } from './message';
+import { Message, EncryptedContent, Reactions } from './message';
 import {
   MessageNotDecryptedContent,
   MessageUnsupportedContent,
@@ -253,6 +259,12 @@ function ThreadMessages({
   // starts with few/no events loaded, so backfill by paginating its timeline.
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [editId, setEditId] = useState<string>();
+
+  const permissions = useRoomPermissions(creators, powerLevels);
+  const canRedact = permissions.action('redact', mx.getSafeUserId());
+  const canDeleteOwn = permissions.event(MessageEvent.RoomRedaction, mx.getSafeUserId());
+  const canSendReaction = permissions.event(MessageEvent.Reaction, mx.getSafeUserId());
 
   useEffect(() => {
     // Only re-render when the event actually belongs to this thread's timeline
@@ -362,7 +374,30 @@ function ThreadMessages({
   const onReplyClick: MouseEventHandler<HTMLButtonElement> = useCallback((evt) => {
     evt.preventDefault();
   }, []);
-  const onReactionToggle = useCallback(() => undefined, []);
+  const onReactionToggle = useCallback(
+    (targetEventId: string, key: string, shortcode?: string) => {
+      const relations = getEventReactions(thread.timelineSet, targetEventId);
+      const allReactions = relations?.getSortedAnnotationsByKey() ?? [];
+      const [, reactionsSet] = allReactions.find(([k]) => k === key) ?? [];
+      const reactions = reactionsSet ? Array.from(reactionsSet) : [];
+      const myReaction = reactions.find(factoryEventSentBy(mx.getSafeUserId()));
+
+      if (myReaction && myReaction.isRelation()) {
+        const myReactionId = myReaction.getId();
+        if (myReactionId) mx.redactEvent(room.roomId, myReactionId);
+        return;
+      }
+      const rShortcode =
+        shortcode ||
+        (reactions.find(eventWithShortcode)?.getContent().shortcode as string | undefined);
+      mx.sendEvent(
+        room.roomId,
+        MessageEvent.Reaction as any,
+        getReactionContent(targetEventId, key, rShortcode)
+      );
+    },
+    [mx, room, thread]
+  );
 
   if (loading) {
     return (
@@ -395,6 +430,10 @@ function ThreadMessages({
         const getContent = (() =>
           editedEvent?.getContent()['m.new_content'] ?? mEvent.getContent()) as unknown as GetContentCallback;
         const eventType = mEvent.getType();
+        const reactionRelations = eventId
+          ? getEventReactions(thread.timelineSet, eventId)
+          : undefined;
+        const hasReactions = !!reactionRelations?.getSortedAnnotationsByKey()?.length;
 
         return (
           <Message
@@ -410,6 +449,25 @@ function ThreadMessages({
             onUsernameClick={onUserClick}
             onReplyClick={onReplyClick}
             onReactionToggle={onReactionToggle}
+            edit={!!eventId && editId === eventId}
+            onEditId={setEditId}
+            canDelete={canRedact || (canDeleteOwn && senderId === mx.getUserId())}
+            canSendReaction={canSendReaction}
+            relations={hasReactions ? reactionRelations : undefined}
+            reactions={
+              hasReactions &&
+              reactionRelations &&
+              eventId && (
+                <Reactions
+                  style={{ marginTop: config.space.S200 }}
+                  room={room}
+                  relations={reactionRelations}
+                  mEventId={eventId}
+                  canSendReaction={canSendReaction}
+                  onReactionToggle={onReactionToggle}
+                />
+              )
+            }
             hideReadReceipts={hideActivity}
             showDeveloperTools={showDeveloperTools}
             memberPowerTag={getMemberPowerTag(senderId)}
