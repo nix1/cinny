@@ -129,6 +129,7 @@ import { useAccessiblePowerTagColors, useGetMemberPowerTag } from '../../hooks/u
 import { useTheme } from '../../hooks/useTheme';
 import { useRoomCreatorsTag } from '../../hooks/useRoomCreatorsTag';
 import { usePowerLevelTags } from '../../hooks/usePowerLevelTags';
+import { getUrlPreviewMode } from '../../utils/linkPreview';
 
 const TimelineFloat = as<'div', css.TimelineFloatVariants>(
   ({ position, className, ...props }, ref) => (
@@ -446,7 +447,11 @@ export function RoomTimeline({ room, eventId, roomInputRef, editor }: RoomTimeli
   const [mediaAutoLoad] = useSetting(settingsAtom, 'mediaAutoLoad');
   const [urlPreview] = useSetting(settingsAtom, 'urlPreview');
   const [encUrlPreview] = useSetting(settingsAtom, 'encUrlPreview');
-  const showUrlPreview = room.hasEncryptionStateEvent() ? encUrlPreview : urlPreview;
+  const showUrlPreview = getUrlPreviewMode(
+    room.hasEncryptionStateEvent(),
+    urlPreview,
+    encUrlPreview
+  );
   const [showHiddenEvents] = useSetting(settingsAtom, 'showHiddenEvents');
   const [showDeveloperTools] = useSetting(settingsAtom, 'developerTools');
 

@@ -15,16 +15,17 @@ import { mxcUrlToHttp } from '../../utils/matrix';
 import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
 import { ImageViewer } from '../image-viewer';
 import { onEnterOrSpace } from '../../utils/keyboard';
+import { getLinkPreview } from '../../utils/linkPreview';
 
 const linkStyles = { color: color.Success.Main };
 
-export const UrlPreviewCard = as<'div', { url: string; ts: number }>(
-  ({ url, ts, ...props }, ref) => {
+export const UrlPreviewCard = as<'div', { url: string; ts: number; allowServer?: boolean }>(
+  ({ url, ts, allowServer = true, ...props }, ref) => {
     const mx = useMatrixClient();
     const useAuthentication = useMediaAuthentication();
     const [viewer, setViewer] = useState(false);
     const [previewStatus, loadPreview] = useAsyncCallback(
-      useCallback(() => mx.getUrlPreview(url, ts), [url, ts, mx])
+      useCallback(() => getLinkPreview(mx, url, ts, allowServer), [url, ts, mx, allowServer])
     );
 
     useEffect(() => {
@@ -34,17 +35,14 @@ export const UrlPreviewCard = as<'div', { url: string; ts: number }>(
     if (previewStatus.status === AsyncStatus.Error) return null;
 
     const renderContent = (prev: IPreviewUrlResponse) => {
-      const thumbUrl = mxcUrlToHttp(
-        mx,
-        prev['og:image'] || '',
-        useAuthentication,
-        256,
-        256,
-        'scale',
-        false
-      );
+      const image = typeof prev['og:image'] === 'string' ? prev['og:image'] : '';
+      // Local previews link the image on the web; server previews use mxc://.
+      const isWebImage = /^https?:\/\//.test(image);
+      const thumbUrl = isWebImage
+        ? image
+        : mxcUrlToHttp(mx, image, useAuthentication, 256, 256, 'scale', false);
 
-      const imgUrl = mxcUrlToHttp(mx, prev['og:image'] || '', useAuthentication);
+      const imgUrl = isWebImage ? image : mxcUrlToHttp(mx, image, useAuthentication);
 
       return (
         <>

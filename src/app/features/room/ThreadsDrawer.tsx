@@ -25,6 +25,7 @@ import classNames from 'classnames';
 import FocusTrap from 'focus-trap-react';
 import { Opts as LinkifyOpts } from 'linkifyjs';
 import { HTMLReactParserOptions } from 'html-react-parser';
+import { getUrlPreviewMode } from '../../utils/linkPreview';
 
 import { useRoomNavigate } from '../../hooks/useRoomNavigate';
 import { useThreadUnreadCount } from '../../hooks/useThreadUnreadCount';
@@ -197,7 +198,11 @@ function ThreadMessages({
   const [mediaAutoLoad] = useSetting(settingsAtom, 'mediaAutoLoad');
   const [urlPreview] = useSetting(settingsAtom, 'urlPreview');
   const [encUrlPreview] = useSetting(settingsAtom, 'encUrlPreview');
-  const showUrlPreview = room.hasEncryptionStateEvent() ? encUrlPreview : urlPreview;
+  const showUrlPreview = getUrlPreviewMode(
+    room.hasEncryptionStateEvent(),
+    urlPreview,
+    encUrlPreview
+  );
   const [showDeveloperTools] = useSetting(settingsAtom, 'developerTools');
   const [hour24Clock] = useSetting(settingsAtom, 'hour24Clock');
   const [dateFormatString] = useSetting(settingsAtom, 'dateFormatString');
