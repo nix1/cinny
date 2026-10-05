@@ -447,10 +447,12 @@ export function RoomTimeline({ room, eventId, roomInputRef, editor }: RoomTimeli
   const [mediaAutoLoad] = useSetting(settingsAtom, 'mediaAutoLoad');
   const [urlPreview] = useSetting(settingsAtom, 'urlPreview');
   const [encUrlPreview] = useSetting(settingsAtom, 'encUrlPreview');
+  const [localUrlPreview] = useSetting(settingsAtom, 'localUrlPreview');
   const showUrlPreview = getUrlPreviewMode(
     room.hasEncryptionStateEvent(),
     urlPreview,
-    encUrlPreview
+    encUrlPreview,
+    localUrlPreview
   );
   const [showHiddenEvents] = useSetting(settingsAtom, 'showHiddenEvents');
   const [showDeveloperTools] = useSetting(settingsAtom, 'developerTools');

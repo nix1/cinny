@@ -198,10 +198,12 @@ function ThreadMessages({
   const [mediaAutoLoad] = useSetting(settingsAtom, 'mediaAutoLoad');
   const [urlPreview] = useSetting(settingsAtom, 'urlPreview');
   const [encUrlPreview] = useSetting(settingsAtom, 'encUrlPreview');
+  const [localUrlPreview] = useSetting(settingsAtom, 'localUrlPreview');
   const showUrlPreview = getUrlPreviewMode(
     room.hasEncryptionStateEvent(),
     urlPreview,
-    encUrlPreview
+    encUrlPreview,
+    localUrlPreview
   );
   const [showDeveloperTools] = useSetting(settingsAtom, 'developerTools');
   const [hour24Clock] = useSetting(settingsAtom, 'hour24Clock');

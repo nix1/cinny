@@ -50,6 +50,7 @@ import { useMessageLayoutItems } from '../../../hooks/useMessageLayout';
 import { useMessageSpacingItems } from '../../../hooks/useMessageSpacing';
 import { useDateFormatItems } from '../../../hooks/useDateFormat';
 import { SequenceCardStyle } from '../styles.css';
+import { hasLocalLinkPreview } from '../../../utils/linkPreview';
 
 type ThemeSelectorProps = {
   themeNames: Record<string, string>;
@@ -908,6 +909,7 @@ function Messages() {
   const [mediaAutoLoad, setMediaAutoLoad] = useSetting(settingsAtom, 'mediaAutoLoad');
   const [urlPreview, setUrlPreview] = useSetting(settingsAtom, 'urlPreview');
   const [encUrlPreview, setEncUrlPreview] = useSetting(settingsAtom, 'encUrlPreview');
+  const [localUrlPreview, setLocalUrlPreview] = useSetting(settingsAtom, 'localUrlPreview');
   const [showHiddenEvents, setShowHiddenEvents] = useSetting(settingsAtom, 'showHiddenEvents');
 
   return (
@@ -976,9 +978,21 @@ function Messages() {
       <SequenceCard className={SequenceCardStyle} variant="SurfaceVariant" direction="Column">
         <SettingTile
           title="Url Preview in Encrypted Room"
+          description="Lets the homeserver fetch previews of links from encrypted rooms, so it sees those links."
           after={<Switch variant="Primary" value={encUrlPreview} onChange={setEncUrlPreview} />}
         />
       </SequenceCard>
+      {hasLocalLinkPreview() && (
+        <SequenceCard className={SequenceCardStyle} variant="SurfaceVariant" direction="Column">
+          <SettingTile
+            title="Fetch Url Previews Locally"
+            description="Cannella fetches previews itself, also in encrypted rooms, without sending links to the homeserver. Websites see your IP address."
+            after={
+              <Switch variant="Primary" value={localUrlPreview} onChange={setLocalUrlPreview} />
+            }
+          />
+        </SequenceCard>
+      )}
       <SequenceCard className={SequenceCardStyle} variant="SurfaceVariant" direction="Column">
         <SettingTile
           title="Show Hidden Events"

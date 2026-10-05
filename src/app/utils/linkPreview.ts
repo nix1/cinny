@@ -14,11 +14,12 @@ export const hasLocalLinkPreview = (): boolean => typeof tauri()?.invoke === 'fu
 export const getUrlPreviewMode = (
   encrypted: boolean,
   urlPreview: boolean,
-  encUrlPreview: boolean
+  encUrlPreview: boolean,
+  localUrlPreview: boolean
 ): UrlPreviewMode => {
   if (!encrypted) return urlPreview;
   if (encUrlPreview) return true;
-  return urlPreview && hasLocalLinkPreview() ? 'local' : false;
+  return urlPreview && localUrlPreview && hasLocalLinkPreview() ? 'local' : false;
 };
 
 const localCache = new Map<string, Promise<IPreviewUrlResponse>>();
@@ -37,9 +38,10 @@ export const getLinkPreview = async (
   mx: MatrixClient,
   url: string,
   ts: number,
-  allowServer: boolean
+  allowServer: boolean,
+  allowLocal = true
 ): Promise<IPreviewUrlResponse> => {
-  if (hasLocalLinkPreview()) {
+  if (allowLocal && hasLocalLinkPreview()) {
     try {
       return await getLocalPreview(url);
     } catch (e) {

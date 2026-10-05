@@ -16,6 +16,8 @@ import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
 import { ImageViewer } from '../image-viewer';
 import { onEnterOrSpace } from '../../utils/keyboard';
 import { getLinkPreview } from '../../utils/linkPreview';
+import { useSetting } from '../../state/hooks/settings';
+import { settingsAtom } from '../../state/settings';
 
 const linkStyles = { color: color.Success.Main };
 
@@ -23,9 +25,13 @@ export const UrlPreviewCard = as<'div', { url: string; ts: number; allowServer?:
   ({ url, ts, allowServer = true, ...props }, ref) => {
     const mx = useMatrixClient();
     const useAuthentication = useMediaAuthentication();
+    const [localUrlPreview] = useSetting(settingsAtom, 'localUrlPreview');
     const [viewer, setViewer] = useState(false);
     const [previewStatus, loadPreview] = useAsyncCallback(
-      useCallback(() => getLinkPreview(mx, url, ts, allowServer), [url, ts, mx, allowServer])
+      useCallback(
+        () => getLinkPreview(mx, url, ts, allowServer, localUrlPreview),
+        [url, ts, mx, allowServer, localUrlPreview]
+      )
     );
 
     useEffect(() => {
