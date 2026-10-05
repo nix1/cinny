@@ -18,9 +18,9 @@ export function WelcomePage() {
             title="Welcome to Cannella"
             subTitle={
               <span>
-                Yet another matrix client.{' '}
+                A fork of Cinny with threads and local search.{' '}
                 <a
-                  href="https://github.com/cinnyapp/cinny/releases"
+                  href="https://github.com/nix1/cinny-desktop/commits/main"
                   target="_blank"
                   rel="noreferrer noopener"
                 >
@@ -33,7 +33,7 @@ export function WelcomePage() {
               <Box grow="Yes" style={{ maxWidth: toRem(300) }} direction="Column" gap="300">
                 <Button
                   as="a"
-                  href="https://github.com/cinnyapp/cinny"
+                  href="https://github.com/nix1/cinny-desktop"
                   target="_blank"
                   rel="noreferrer noopener"
                   before={<Icon size="200" src={Icons.Code} />}
